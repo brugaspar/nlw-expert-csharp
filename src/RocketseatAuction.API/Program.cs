@@ -1,6 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using RocketseatAuction.API.Contracts;
 using RocketseatAuction.API.Filters;
+using RocketseatAuction.API.Repositories;
+using RocketseatAuction.API.Repositories.DataAccess;
 using RocketseatAuction.API.Services;
+using RocketseatAuction.API.UseCases.Auctions.GetCurrent;
 using RocketseatAuction.API.UseCases.Offers.CreateOffer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,8 +46,18 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddScoped<AuthenticationUserAttribute>();
-builder.Services.AddScoped<LoggedUser>();
+builder.Services.AddScoped<GetCurrentAuctionUseCase>();
+builder.Services.AddScoped<ILoggedUser, LoggedUser>();
 builder.Services.AddScoped<CreateOfferUseCase>();
+builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IOfferRepository, OfferRepository>();
+
+builder.Services.AddDbContext<RocketseatAuctionDbContext>(options =>
+{
+    var path = @"Data Source=C:\Users\Bruno\Documents\Projects\rocketseat\nlw-expert\c-sharp\RocketseatAuction\database.db";
+    options.UseSqlite(path);
+});
 
 builder.Services.AddHttpContextAccessor();
 
